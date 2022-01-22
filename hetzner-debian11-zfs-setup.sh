@@ -622,14 +622,19 @@ CONF
 
 ip6addr_prefix=$(ip -6 a s | grep -E "inet6.+global" | sed -nE 's/.+inet6\s(([0-9a-z]{1,4}:){4,4}).+/\1/p')
 
-cat <<CONF > /mnt/etc/systemd/network/10-eth0.network
-[Match]
-Name=eth0
+cat <<CONF > /mnt/etc/network/interfaces.d/10-hetzner-cloud.cfg
+auto lo
+iface lo inet loopback
 
-[Network]
-DHCP=ipv4
-Address=${ip6addr_prefix}:1/64
-Gateway=fe80::1
+auto eth0
+iface eth0 inet dhcp
+    dns-nameservers 185.12.64.2 185.12.64.1
+
+# control-alias eth0
+iface eth0 inet6 static
+    address ${ip6addr_prefix}:1/64
+    dns-nameservers 2a01:4ff:ff00::add:1 2a01:4ff:ff00::add:2
+    gateway fe80::1
 CONF
 chroot_execute "systemctl enable systemd-networkd.service"
 
