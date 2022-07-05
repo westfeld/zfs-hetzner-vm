@@ -583,6 +583,8 @@ zfs create -o canmount=off                 "$v_rpool_name/usr"
 zfs create                                 "$v_rpool_name/usr/local"
 
 zfs create                                 "$v_rpool_name/var/mail"
+zfs create                                 "$v_rpool_name/var/www"
+zfs create                                 "$v_rpool_name/opt"
 
 zfs create -o com.sun:auto-snapshot=false -o canmount=on -o mountpoint=/tmp "$v_rpool_name/tmp"
 chmod 1777 "$c_zfs_mount_dir/tmp"
@@ -654,9 +656,6 @@ chroot_execute "apt update"
 echo "======= setting locale, console and language =========="
 chroot_execute "apt install --yes -qq locales debconf-i18n apt-utils"
 sed -i 's/# en_US.UTF-8/en_US.UTF-8/' "$c_zfs_mount_dir/etc/locale.gen"
-sed -i 's/# fr_FR.UTF-8/fr_FR.UTF-8/' "$c_zfs_mount_dir/etc/locale.gen"
-sed -i 's/# fr_FR.UTF-8/fr_FR.UTF-8/' "$c_zfs_mount_dir/etc/locale.gen"
-sed -i 's/# de_AT.UTF-8/de_AT.UTF-8/' "$c_zfs_mount_dir/etc/locale.gen"
 sed -i 's/# de_DE.UTF-8/de_DE.UTF-8/' "$c_zfs_mount_dir/etc/locale.gen"
 
 chroot_execute 'cat <<CONF | debconf-set-selections
@@ -782,7 +781,8 @@ fi
 
 echo "============setup root prompt============"
 cat > "$c_zfs_mount_dir/root/.bashrc" <<CONF
-export PS1='\[\033[01;31m\]\u\[\033[01;33m\]@\[\033[01;32m\]\h \[\033[01;33m\]\w \[\033[01;35m\]\$ \[\033[00m\]'
+# export PS1='\[\033[01;31m\]\u\[\033[01;33m\]@\[\033[01;32m\]\h \[\033[01;33m\]\w \[\033[01;35m\]\$ \[\033[00m\]'
+export PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$'
 umask 022
 export LS_OPTIONS='--color=auto -h'
 eval "\$(dircolors)"
@@ -856,4 +856,4 @@ echo "======= unmounting filesystems and zfs pools =========="
 unmount_and_export_fs
 
 echo "======== setup complete, rebooting ==============="
-reboot
+#reboot
