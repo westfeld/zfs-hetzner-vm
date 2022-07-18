@@ -706,6 +706,7 @@ chroot_execute "apt install --yes linux-image${v_kernel_variant}-amd64 linux-hea
 
 echo "======= installing aux packages =========="
 chroot_execute "apt install --yes man wget curl software-properties-common nano htop gnupg"
+chroot_execute "apt install --yes tmux nginx git neovim php7.4-fpm"
 
 echo "======= installing zfs packages =========="
 chroot_execute 'echo "zfs-dkms zfs-dkms/note-incompatible-licenses note true" | debconf-set-selections'
@@ -781,8 +782,7 @@ fi
 
 echo "============setup root prompt============"
 cat > "$c_zfs_mount_dir/root/.bashrc" <<CONF
-# export PS1='\[\033[01;31m\]\u\[\033[01;33m\]@\[\033[01;32m\]\h \[\033[01;33m\]\w \[\033[01;35m\]\$ \[\033[00m\]'
-export PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$'
+export PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 umask 022
 export LS_OPTIONS='--color=auto -h'
 eval "\$(dircolors)"
